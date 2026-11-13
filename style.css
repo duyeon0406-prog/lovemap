@@ -1,0 +1,161 @@
+:root {
+  --bg: #f5f2f4;
+  --surface: #ffffff;
+  --ink: #26181f;
+  --muted: #8b7f86;
+  --line: #ebe4e8;
+  --rose: #e5446d;
+  --rose-dark: #c42d55;
+  --rose-soft: #fce8ee;
+
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --shadow: 0 20px 50px -24px rgba(60, 20, 40, .35), 0 2px 6px rgba(60, 20, 40, .06);
+  --sans: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  --hand: 'Nanum Pen Script', cursive;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--sans); color: var(--ink); background: var(--bg);
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+
+/* 네이버 지도가 position을 덮어써서 크기를 직접 지정 */
+#map { width: 100vw; height: 100vh; height: 100dvh; }
+/* 지도 타일 색을 살짝 빼서 핀과 코스 선이 더 잘 보이게 */
+#map img { filter: saturate(.55) brightness(1.03); }
+
+/* ===== 지도 위에 떠 있는 패널 ===== */
+.panel {
+  position: fixed; z-index: 10;
+  top: 20px; left: 20px; bottom: 20px; width: 360px;
+  display: flex; flex-direction: column;
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-head { padding: 28px 26px 0; }
+.panel-head h1 {
+  font-size: 1.65rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2;
+}
+.panel-head p { font-size: .92rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.panel-head .count { color: var(--rose-dark); font-weight: 600; margin-top: 14px; font-size: .88rem; }
+
+.toolbar { display: flex; gap: 8px; padding: 18px 26px 18px; border-bottom: 1px solid var(--line); }
+.btn {
+  flex: 1; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+  font: inherit; font-size: .86rem; font-weight: 600; cursor: pointer;
+  background: var(--surface); color: var(--ink);
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn:hover { border-color: #d9ccd3; background: #faf7f9; }
+.btn.on { background: var(--rose-soft); border-color: transparent; color: var(--rose-dark); }
+.btn:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+
+/* ===== 코스 순서 타임라인 ===== */
+#list { list-style: none; overflow-y: auto; padding: 14px 14px 20px; flex: 1; }
+#list li { position: relative; }
+/* 점과 점을 잇는 세로선 */
+#list li:not(:last-child)::after {
+  content: ''; position: absolute; left: 27px; top: 40px; bottom: -8px;
+  width: 2px; background: var(--line);
+}
+.stop {
+  width: 100%; display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: start;
+  padding: 12px; border: 0; border-radius: var(--radius-md);
+  background: none; text-align: left; font: inherit; color: inherit; cursor: pointer;
+  transition: background .15s;
+}
+.stop:hover { background: #faf6f8; }
+.stop:focus-visible { outline: 2px solid var(--rose); outline-offset: -2px; }
+.stop .num {
+  position: relative; z-index: 1;
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface); border: 2px solid var(--line);
+  font-size: .78rem; font-weight: 700; color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.stop .name { font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; line-height: 28px; }
+.stop .preview {
+  display: block; color: var(--muted); font-size: .86rem; line-height: 1.45; margin-top: 1px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.stop .date { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; }
+
+#list li.active .stop { background: var(--rose-soft); }
+#list li.active .num { background: var(--rose); border-color: var(--rose); color: #fff; }
+#list li.active .name { color: var(--rose-dark); }
+
+/* ===== 지도 핀 (번호가 적힌 물방울 모양) ===== */
+.pin {
+  width: 32px; height: 32px; display: grid; place-items: center;
+  border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  background: var(--surface); border: 2.5px solid var(--rose);
+  box-shadow: 0 6px 14px -4px rgba(60, 20, 40, .45);
+  transition: transform .18s, background .18s;
+  cursor: pointer;
+}
+.pin span {
+  transform: rotate(45deg);
+  font: 700 13px/1 var(--sans); color: var(--rose-dark);
+}
+.pin.active { background: var(--rose); transform: rotate(-45deg) scale(1.18); }
+.pin.active span { color: #fff; }
+
+/* ===== 지도 위 말풍선 카드 ===== */
+.info {
+  position: relative;
+  width: 260px; padding: 18px 20px 20px;
+  background: var(--surface); border-radius: 18px;
+  box-shadow: var(--shadow);
+  font-family: var(--sans); color: var(--ink);
+}
+.info::after { /* 말풍선 꼬리 */
+  content: ''; position: absolute; left: 50%; bottom: -7px;
+  width: 14px; height: 14px; background: var(--surface);
+  transform: translateX(-50%) rotate(45deg); border-radius: 0 0 3px 0;
+}
+.info .step { font-size: .78rem; font-weight: 600; color: var(--rose-dark); }
+.info h3 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.03em; margin-top: 4px; }
+.info .date { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+.info .memo {
+  font-family: var(--hand); font-size: 1.45rem; line-height: 1.25; color: #4a2f3b;
+  margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line);
+  white-space: pre-wrap; word-break: keep-all;
+}
+
+/* 개발용 좌표 확인 창 */
+#devbox {
+  position: fixed; right: 12px; bottom: 12px; z-index: 1000; max-width: 80vw;
+  padding: 10px 12px; border-radius: 10px; background: var(--ink); color: #fff; font: .8rem monospace;
+}
+#devbox[hidden] { display: none; }
+
+/* ===== 모바일: 패널을 아래쪽 시트로 ===== */
+@media (max-width: 700px) {
+  .panel {
+    top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 46%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .panel::before { /* 손잡이 */
+    content: ''; display: block; width: 40px; height: 4px; border-radius: 4px;
+    background: var(--line); margin: 10px auto 0;
+  }
+  .panel-head { padding: 14px 20px 0; }
+  .panel-head h1 { font-size: 1.35rem; }
+  .panel-head p:not(.count) { display: none; }
+  .panel-head .count { margin-top: 4px; }
+  .toolbar { padding: 12px 20px; }
+  #list { padding: 8px 10px 16px; }
+  .info { width: 230px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .stop, .stop .num, .pin { transition: none; }
+}

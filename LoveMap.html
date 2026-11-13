@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>우리의 데이트 코스</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- 발급받은 클라이언트 ID를 아래 '발급받은_클라이언트_ID' 자리에 넣어주세요 -->
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=8gaaxx57on"></script>
+</head>
+<body>
+  <div id="map"></div>
+
+  <aside class="panel">
+    <header class="panel-head">
+      <h1>우리의 데이트 코스</h1>
+      <p>같이 걸었던 곳들을 순서대로 이어봤어</p>
+      <p class="count" id="count"></p>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn" id="btn-fit">전체 보기</button>
+      <button class="btn on" id="btn-route" aria-pressed="true">코스 선 숨기기</button>
+    </div>
+
+    <ol id="list"></ol>
+  </aside>
+
+  <!-- 개발용: 주소 끝에 ?dev 를 붙였을 때만 좌표 확인 창이 떠요 -->
+  <div id="devbox" hidden></div>
+
+  <script src="places.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
